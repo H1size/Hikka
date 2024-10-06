@@ -6,6 +6,8 @@ ENV PIP_NO_CACHE_DIR=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
+RUN apt-get update && apt-get install -y ffmpeg \
+    && pip install Pillow requests emoji moviepy python-ffmpeg bs4 uvloop
 RUN apt update && apt install libcairo2 git build-essential -y --no-install-recommends
 RUN rm -rf /var/lib/apt/lists /var/cache/apt/archives /tmp/*
 
