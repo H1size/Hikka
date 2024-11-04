@@ -1,25 +1,23 @@
-FROM archlinux:latest as python-base
+FROM python:3.8-slim as python-base
+ENV DOCKER=true
+ENV GIT_PYTHON_REFRESH=quiet
 
-# Установка необходимых пакетов
-RUN pacman -Syu --noconfirm 
-    && pacman -S --noconfirm python python-pip ffmpeg git base-devel neofetch 
-    && pacman -Scc --noconfirm
+ENV PIP_NO_CACHE_DIR=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
 
-# Установка Python-библиотек
-RUN pip install --no-cache-dir Pillow requests emoji moviepy python-ffmpeg beautifulsoup4 uvloop
+RUN apt-get update && apt-get install -y ffmpeg \
+    && pip install Pillow requests emoji moviepy python-ffmpeg bs4 uvloop
+RUN apt update && apt install libcairo2 git build-essential neofetch -y --no-install-recommends
+RUN rm -rf /var/lib/apt/lists /var/cache/apt/archives /tmp/*
 
-# Создание директории для приложения
 RUN mkdir /data
 
-# Копирование файлов в контейнер
 COPY . /data/Hikka
 WORKDIR /data/Hikka
 
-# Установка зависимостей из requirements.txt
 RUN pip install --no-warn-script-location --no-cache-dir -U -r requirements.txt
 
-# Открытие порта
 EXPOSE 8080
 
-# Команда для запуска приложения
-CMD ["python", "-m", "hikka"]
+CMD python -m hikka
